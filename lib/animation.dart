@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/homePage.dart';
+import 'package:flutter_app/singPage.dart';
+import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 class A extends StatefulWidget {
 
@@ -14,7 +16,7 @@ class _AState extends State<A> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    c = AnimationController(duration: Duration(milliseconds: 250), vsync: this);
+    c = AnimationController(duration: Duration(milliseconds: 400), vsync: this);
   }
 
   @override
@@ -46,17 +48,42 @@ class _AState extends State<A> with TickerProviderStateMixin {
                         offset: Offset(0, c.value == 0 ? 300 : 300 - c.value * 1.2 * 300),
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(40, 0, 40, 0),
-                          child: Container(
-                              height: 300,
-                              width: double.infinity,
-                              color: Colors.white,
-                              child: Center(
-                                  child: TextButton(
-                                    onPressed: () => c.reverse(),
-                                    child: Text('reverse', style: TextStyle(color: Colors.white)),
-                                    style: ButtonStyle(backgroundColor: MaterialStateColor.resolveWith((_) => Colors.blue))
-                                  )
-                              )
+                          child: FractionallySizedBox(
+                            heightFactor: 0.3,
+                            widthFactor: 0.7,
+                            child: Container(
+                                decoration: _background(),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    NeumorphicButton(
+                                        onPressed: c.reverse,
+                                        child: Text('Cancel', style: TextStyle(color: Colors.black)),
+                                        padding: EdgeInsets.fromLTRB(60, 10, 60, 10),
+                                        style: NeumorphicStyle(
+                                            shape: NeumorphicShape.concave,
+                                            depth: 9,
+                                            surfaceIntensity: 0,
+                                            color: Color(0xFFF5EFEF)
+                                        )
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: NeumorphicButton(
+                                          onPressed: () => Navigator.of(context).pushReplacement(_createRoute()),
+                                          child: Text('Logout', style: TextStyle(color: Colors.black)),
+                                          padding: EdgeInsets.fromLTRB(60, 10, 60, 10),
+                                          style: NeumorphicStyle(
+                                              shape: NeumorphicShape.concave,
+                                              depth: 9,
+                                              surfaceIntensity: 0,
+                                              color: Color(0xFFF5EFEF)
+                                          )
+                                      ),
+                                    )
+                                  ]
+                                )
+                            ),
                           ),
                         )
                     )
@@ -71,6 +98,37 @@ class _AState extends State<A> with TickerProviderStateMixin {
     return InkWell(
         onTap: () => c.forward(),
         child: HomePage()
+    );
+  }
+
+  BoxDecoration _background(){
+    return BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        gradient: LinearGradient(
+            begin: Alignment.bottomRight,
+            end: Alignment.topLeft,
+            colors: [
+              Color(0xFF654ea3),
+              Color(0xFFeaafc8)
+            ]
+        )
+    );
+  }
+
+  Route _createRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => SignPage(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = Offset(0, -1);
+        var end = Offset.zero;
+        var tween = Tween(begin: begin, end: end);
+        var offsetAnimation = animation.drive(tween);
+
+        return SlideTransition(
+            position: offsetAnimation,
+            child: child
+        );
+      }
     );
   }
 }

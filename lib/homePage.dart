@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_app/singPage.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
 class HomePage extends StatefulWidget {

@@ -83,7 +83,7 @@ class _SignState extends State<SignPage> with TickerProviderStateMixin {
                                                                         surfaceIntensity: 0,
                                                                         color: Color(0xFFF5EFEF)
                                                                     )
-                                                                ),
+                                                                )
                                                               ),
                                                               NeumorphicButton(
                                                                   onPressed: (){
