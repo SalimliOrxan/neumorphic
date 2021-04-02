@@ -18,53 +18,50 @@ class _HomeState extends State<HomePage> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.dark);
 
-    return Container(
-      color: Color(0xFFF8F8F8),
-      child: SafeArea(
-        child: Scaffold(
-            backgroundColor: Color(0xFFF8F8F8),
-            appBar: AppBar(
-                backgroundColor: Color(0xFFF8F8F8),
-                elevation: 0,
-                actions: [
-                  Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: NeumorphicButton(
-                          onPressed: (){
+    return SafeArea(
+      child: Scaffold(
+          backgroundColor: Color(0xFFF8F8F8),
+          appBar: AppBar(
+              backgroundColor: Color(0xFFF8F8F8),
+              elevation: 0,
+              actions: [
+                Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: NeumorphicButton(
+                        onPressed: (){
 
-                          },
-                          child: Icon(Icons.search, color: Colors.black),
-                          padding: EdgeInsets.all(10),
-                          style: NeumorphicStyle(
-                              shape: NeumorphicShape.concave,
-                              boxShape: NeumorphicBoxShape.circle(),
-                              depth: 3,
-                              surfaceIntensity: 0,
-                              color: Color(0xFFE1DFDF)
-                          )
-                      )
-                  )
-                ]
-            ),
-            bottomNavigationBar: _navBar(),
-            body: Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Column(
-                children: [
-                  _story(),
-                  Flexible(
-                    child: ListView.builder(
-                        itemCount: 10,
-                        shrinkWrap: true,
-                        padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
-                        itemBuilder: (context, position) => _item()
-                    ),
+                        },
+                        child: Icon(Icons.search, color: Colors.black),
+                        padding: EdgeInsets.all(10),
+                        style: NeumorphicStyle(
+                            shape: NeumorphicShape.concave,
+                            boxShape: NeumorphicBoxShape.circle(),
+                            depth: 3,
+                            surfaceIntensity: 0,
+                            color: Color(0xFFE1DFDF)
+                        )
+                    )
+                )
+              ]
+          ),
+          bottomNavigationBar: _navBar(),
+          body: Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Column(
+              children: [
+                _story(),
+                Flexible(
+                  child: ListView.builder(
+                      itemCount: 10,
+                      shrinkWrap: true,
+                      padding: EdgeInsets.fromLTRB(16, 10, 16, 10),
+                      itemBuilder: (context, position) => _item()
                   ),
-                ],
-              ),
-            )
-        ),
-      ),
+                ),
+              ],
+            ),
+          )
+      )
     );
   }
 
@@ -154,17 +151,17 @@ class _HomeState extends State<HomePage> {
         child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                child: Neumorphic(
-                    padding: EdgeInsets.all(1),
-                    style: NeumorphicStyle(
-                        color: Colors.white,
-                        shape: NeumorphicShape.concave,
-                        depth: 9,
-                        surfaceIntensity: 0
-                    ),
-                    child: Container()
-                ),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                  child: Neumorphic(
+                      padding: EdgeInsets.all(1),
+                      style: NeumorphicStyle(
+                          color: Colors.white,
+                          shape: NeumorphicShape.concave,
+                          depth: 9,
+                          surfaceIntensity: 0
+                      ),
+                      child: Container()
+                  )
               ),
               CustomNavigationBar(
                   onTap: (index){

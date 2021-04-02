@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/homePage.dart';
+import 'package:flutter_app/singPage.dart';
 
 class App extends StatelessWidget {
 
@@ -9,7 +9,7 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Web Demo',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: HomePage()
+      home: SignPage()
     );
   }
 }
