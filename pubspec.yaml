@@ -32,6 +32,8 @@ dependencies:
   flutter_animator: ^3.1.0
   flutter_neumorphic: ^3.1.0
   custom_navigation_bar: ^0.7.1
+  flutter_hooks: ^0.16.0
+  hooks_riverpod: ^0.14.0
 
 dev_dependencies:
   flutter_test:

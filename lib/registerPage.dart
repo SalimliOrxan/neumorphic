@@ -10,21 +10,24 @@ class RegisterPage extends StatelessWidget {
         body: SingleChildScrollView(
           child: Column(
               children: [
-                Neumorphic(
-                    padding: EdgeInsets.only(left: 10, right: 10),
-                    child: TextField(
-                        textInputAction: TextInputAction.next,
-                        keyboardType: TextInputType.name,
-                        decoration: InputDecoration(
-                            hintText: 'Name',
-                            border: InputBorder.none
-                        )
-                    ),
-                    style: NeumorphicStyle(
-                        depth: -5,
-                        surfaceIntensity: 0,
-                        color: Colors.white
-                    )
+                Padding(
+                  padding: const EdgeInsets.only(top: 40),
+                  child: Neumorphic(
+                      padding: EdgeInsets.only(left: 10, right: 10),
+                      child: TextField(
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.name,
+                          decoration: InputDecoration(
+                              hintText: 'Name',
+                              border: InputBorder.none
+                          )
+                      ),
+                      style: NeumorphicStyle(
+                          depth: -5,
+                          surfaceIntensity: 0,
+                          color: Colors.white
+                      )
+                  )
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 10),

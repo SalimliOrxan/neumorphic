@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/homePage.dart';
 import 'package:flutter_app/singPage.dart';
@@ -16,7 +17,7 @@ class _AState extends State<A> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    c = AnimationController(duration: Duration(milliseconds: 400), vsync: this);
+    c = AnimationController(duration: Duration(milliseconds: 200), vsync: this);
   }
 
   @override
@@ -34,15 +35,15 @@ class _AState extends State<A> with TickerProviderStateMixin {
               return Stack(
                   alignment: Alignment.bottomCenter,
                   children: [
-                    Transform.translate(
-                        offset: Offset(0, c.value > 0 ? c.value * -300 : 0),
-                        child: Transform(
-                            transform: Matrix4.identity()
-                              ..setEntry(c.value > 0 ? 3 : 1, c.value > 0 ? 2 : 0, c.value > 0 ? 0.01 : 0)
-                              ..rotateX(c.value <= 0.02 ? c.value : 0.02),
-                            alignment: FractionalOffset.topCenter,
-                            child: getView()
-                        )
+                    Transform(
+                        transform: Matrix4(
+                            1,0,0,0,
+                            0,1,0,0,
+                            0,0,1,0.02,
+                            0,-200*c.value,0,1
+                        )..rotateX(c.value <= 0.02 ? c.value : 0.02),
+                        alignment: FractionalOffset.topCenter,
+                        child: getView()
                     ),
                     Transform.translate(
                         offset: Offset(0, c.value == 0 ? 300 : 300 - c.value * 1.2 * 300),
@@ -54,24 +55,11 @@ class _AState extends State<A> with TickerProviderStateMixin {
                             child: Container(
                                 decoration: _background(),
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    NeumorphicButton(
-                                        onPressed: c.reverse,
-                                        child: Text('Cancel', style: TextStyle(color: Colors.black)),
-                                        padding: EdgeInsets.fromLTRB(60, 10, 60, 10),
-                                        style: NeumorphicStyle(
-                                            shape: NeumorphicShape.concave,
-                                            depth: 9,
-                                            surfaceIntensity: 0,
-                                            color: Color(0xFFF5EFEF)
-                                        )
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: NeumorphicButton(
-                                          onPressed: () => Navigator.of(context).pushReplacement(_createRoute()),
-                                          child: Text('Logout', style: TextStyle(color: Colors.black)),
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      NeumorphicButton(
+                                          onPressed: c.reverse,
+                                          child: Text('Cancel', style: TextStyle(color: Colors.black)),
                                           padding: EdgeInsets.fromLTRB(60, 10, 60, 10),
                                           style: NeumorphicStyle(
                                               shape: NeumorphicShape.concave,
@@ -80,8 +68,21 @@ class _AState extends State<A> with TickerProviderStateMixin {
                                               color: Color(0xFFF5EFEF)
                                           )
                                       ),
-                                    )
-                                  ]
+                                      Padding(
+                                          padding: const EdgeInsets.only(top: 10),
+                                          child: NeumorphicButton(
+                                              onPressed: () => Navigator.of(context).pushReplacement(_createRoute()),
+                                              child: Text('Logout', style: TextStyle(color: Colors.black)),
+                                              padding: EdgeInsets.fromLTRB(60, 10, 60, 10),
+                                              style: NeumorphicStyle(
+                                                  shape: NeumorphicShape.concave,
+                                                  depth: 9,
+                                                  surfaceIntensity: 0,
+                                                  color: Color(0xFFF5EFEF)
+                                              )
+                                          )
+                                      )
+                                    ]
                                 )
                             ),
                           ),
@@ -117,18 +118,18 @@ class _AState extends State<A> with TickerProviderStateMixin {
 
   Route _createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => SignPage(),
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        var begin = Offset(0, -1);
-        var end = Offset.zero;
-        var tween = Tween(begin: begin, end: end);
-        var offsetAnimation = animation.drive(tween);
+        pageBuilder: (context, animation, secondaryAnimation) => SignPage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          var begin = Offset(0, -1);
+          var end = Offset.zero;
+          var tween = Tween(begin: begin, end: end);
+          var offsetAnimation = animation.drive(tween);
 
-        return SlideTransition(
-            position: offsetAnimation,
-            child: child
-        );
-      }
+          return SlideTransition(
+              position: offsetAnimation,
+              child: child
+          );
+        }
     );
   }
 }

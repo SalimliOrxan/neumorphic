@@ -45,69 +45,65 @@ class _SignState extends State<SignPage> with TickerProviderStateMixin {
                       builder: (context, child){
                         return Transform.translate(
                             offset: Offset(0, c.value * -(_isLoginPressed ? transformLengthInLogin : transformLengthInRegister)),
-                            child: Stack(
-                                children: [
-                                  Container(
-                                      decoration: _background(),
-                                      width: double.infinity,
-                                      child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            Transform.translate(
-                                                offset: Offset(0, c.value * (_isLoginPressed ? height * 0.4 : height * 0.53)),
-                                                child: SvgPicture.asset(
-                                                    'resources/images/logo.svg',
-                                                    height: c.value == 0 ? height * 0.3 : (1 - c.value / 6) * height * 0.27
-                                                )
-                                            ),
-                                            Padding(
-                                                padding: const EdgeInsets.fromLTRB(20, 120, 20, 0),
-                                                child: Opacity(
-                                                    opacity: 1 - c.value,
-                                                    child: Transform.translate(
-                                                        offset: Offset(0, c.value * (_isLoginPressed ? height * 0.3 : height * 0.4) * 2),
-                                                        child: Column(
-                                                            children: [
-                                                              Padding(
-                                                                padding: const EdgeInsets.only(bottom: 10),
-                                                                child: NeumorphicButton(
-                                                                    onPressed: (){
-                                                                      _isLoginPressed = true;
-                                                                      c.forward();
-                                                                    },
-                                                                    child: Center(child: Text('Login', style: TextStyle(color: Colors.black))),
-                                                                    padding: EdgeInsets.all(10),
-                                                                    style: NeumorphicStyle(
-                                                                        shape: NeumorphicShape.concave,
-                                                                        depth: 11,
-                                                                        surfaceIntensity: 0,
-                                                                        color: Color(0xFFF5EFEF)
-                                                                    )
-                                                                )
-                                                              ),
-                                                              NeumorphicButton(
-                                                                  onPressed: (){
-                                                                    _isLoginPressed = false;
-                                                                    c.forward();
-                                                                  },
-                                                                  child: Center(child: Text('Register', style: TextStyle(color: Colors.black))),
-                                                                  padding: EdgeInsets.all(10),
-                                                                  style: NeumorphicStyle(
-                                                                      shape: NeumorphicShape.convex,
-                                                                      depth: 11,
-                                                                      surfaceIntensity: 0,
-                                                                      color: Color(0xFFF5EFEF)
-                                                                  )
+                            child: Container(
+                                decoration: _background(),
+                                width: double.infinity,
+                                child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Transform.translate(
+                                          offset: Offset(0, c.value * (_isLoginPressed ? height * 0.4 : height * 0.53)),
+                                          child: SvgPicture.asset(
+                                              'resources/images/logo.svg',
+                                              height: c.value == 0 ? height * 0.3 : (1 - c.value / 6) * height * 0.27
+                                          )
+                                      ),
+                                      Padding(
+                                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                          child: Opacity(
+                                              opacity: 1 - c.value,
+                                              child: Transform.translate(
+                                                  offset: Offset(0, c.value * (_isLoginPressed ? height * 0.4 : height * 0.5) * 2),
+                                                  child: Column(
+                                                      children: [
+                                                        Padding(
+                                                          padding: const EdgeInsets.only(bottom: 10),
+                                                          child: NeumorphicButton(
+                                                              onPressed: (){
+                                                                _isLoginPressed = true;
+                                                                c.forward();
+                                                              },
+                                                              child: Center(child: Text('Login', style: TextStyle(color: Colors.black))),
+                                                              padding: EdgeInsets.all(10),
+                                                              style: NeumorphicStyle(
+                                                                  shape: NeumorphicShape.concave,
+                                                                  depth: 11,
+                                                                  surfaceIntensity: 0,
+                                                                  color: Color(0xFFF5EFEF)
                                                               )
-                                                            ]
+                                                          )
+                                                        ),
+                                                        NeumorphicButton(
+                                                            onPressed: (){
+                                                              _isLoginPressed = false;
+                                                              c.forward();
+                                                            },
+                                                            child: Center(child: Text('Register', style: TextStyle(color: Colors.black))),
+                                                            padding: EdgeInsets.all(10),
+                                                            style: NeumorphicStyle(
+                                                                shape: NeumorphicShape.convex,
+                                                                depth: 11,
+                                                                surfaceIntensity: 0,
+                                                                color: Color(0xFFF5EFEF)
+                                                            )
                                                         )
-                                                    )
-                                                )
-                                            )
-                                          ]
+                                                      ]
+                                                  )
+                                              )
+                                          )
                                       )
-                                  )
-                                ]
+                                    ]
+                                )
                             )
                         );
                       }
@@ -117,15 +113,15 @@ class _SignState extends State<SignPage> with TickerProviderStateMixin {
                       builder: (context, child){
                         return Align(
                           alignment: Alignment.bottomCenter,
-                          child: Opacity(
-                            opacity: c.value,
+                          child: FadeTransition(
+                            opacity: c,
                             child: Padding(
                               padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                               child: Transform.translate(
                                 offset: Offset(
                                     0,
                                     c.value == 0
-                                        ? height * 0.4
+                                        ? height * 0.5
                                         : _isLoginPressed
                                         ? c.value * -(transformLengthInLogin - heightBottomPageInLogin) + 20 // 20 is button radius size
                                         : c.value * -(transformLengthInRegister - heightBottomPageInRegister) + 20
@@ -149,7 +145,6 @@ class _SignState extends State<SignPage> with TickerProviderStateMixin {
                                       Container(
                                           height: _isLoginPressed ? heightBottomPageInLogin : heightBottomPageInRegister,
                                           width: double.infinity,
-                                          padding: EdgeInsets.only(top: 20),
                                           child: _isLoginPressed ? LoginPage() : RegisterPage()
                                       )
                                     ]
