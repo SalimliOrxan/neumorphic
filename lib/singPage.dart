@@ -4,6 +4,7 @@ import 'package:flutter_app/registerPage.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SignPage extends StatefulHookWidget {
 
@@ -13,12 +14,14 @@ class SignPage extends StatefulHookWidget {
 
 class _SignState extends State<SignPage> {
 
-  AnimationController _controllerAnimation;
+  AnimationController _controllerAnimation, _controllerSign;
   bool _isLoginPressed = true;
+  double _left = 150;
 
   @override
   Widget build(BuildContext context) {
-    _controllerAnimation= useAnimationController(duration: Duration(milliseconds: 400));
+    _controllerAnimation = useAnimationController(duration: Duration(milliseconds: 400));
+    _controllerSign      = useAnimationController(duration: Duration(milliseconds: 1200), lowerBound: 0.5)..repeat();
 
     return Scaffold(
         body: LayoutBuilder(
@@ -30,74 +33,26 @@ class _SignState extends State<SignPage> {
               double heightBottomPageInRegister = height * 0.5;
 
               return Stack(
+                  fit: StackFit.expand,
                   children: [
                     AnimatedBuilder(
                         animation: _controllerAnimation,
                         builder: (context, child) {
                           return Transform.translate(
                               offset: Offset(0, _controllerAnimation.value * -(_isLoginPressed ? transformLengthInLogin : transformLengthInRegister)),
-                              child: Container(
-                                  decoration: _background(),
-                                  width: double.infinity,
-                                  child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        Transform.translate(
-                                            offset: Offset(0, _controllerAnimation.value * (_isLoginPressed ? height * 0.4 : height * 0.46)),
-                                            child: SvgPicture.asset(
-                                                'resources/images/logo.svg',
-                                                height: _controllerAnimation.value == 0 ? height * 0.3 : (1 - _controllerAnimation.value / 6) * height * 0.27
-                                            )
-                                        ),
-                                        Padding(
-                                            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                            child: Opacity(
-                                                opacity: 1 - _controllerAnimation.value,
-                                                child: Transform.translate(
-                                                    offset: Offset(0, _controllerAnimation.value * (_isLoginPressed ? height * 0.4 : height * 0.5) * 2),
-                                                    child: Column(
-                                                        children: [
-                                                          Padding(
-                                                              padding: const EdgeInsets.only(bottom: 10),
-                                                              child: NeumorphicButton(
-                                                                  onPressed: () {
-                                                                    _isLoginPressed = true;
-                                                                    _controllerAnimation.forward();
-                                                                  },
-                                                                  child: Center(child: Text('Login', style: TextStyle(color: Colors.black))),
-                                                                  padding: EdgeInsets.all(10),
-                                                                  style: NeumorphicStyle(
-                                                                      shape: NeumorphicShape.convex,
-                                                                      depth: 11,
-                                                                      surfaceIntensity: 0,
-                                                                      color: Color(0xFFEFCBCB)
-                                                                  )
-                                                              )
-                                                          ),
-                                                          NeumorphicButton(
-                                                              onPressed: () {
-                                                                _isLoginPressed = false;
-                                                                _controllerAnimation.forward();
-                                                              },
-                                                              child: Center(child: Text('Register', style: TextStyle(color: Colors.black))),
-                                                              padding: EdgeInsets.all(10),
-                                                              style: NeumorphicStyle(
-                                                                  shape: NeumorphicShape.convex,
-                                                                  depth: 11,
-                                                                  surfaceIntensity: 0,
-                                                                  color: Color(0xFFEFCBCB)
-                                                              )
-                                                          )
-                                                        ]
-                                                    )
-                                                )
-                                            )
-                                        )
-                                      ]
-                                  )
-                              )
+                              child: Container(decoration: _background())
                           );
                         }
+                    ),
+                    AnimatedBuilder(
+                      animation: _controllerAnimation,
+                      builder: (context, _) => FractionallySizedBox(
+                          heightFactor: _controllerAnimation.value == 0 ? 0.3 : (1 - _controllerAnimation.value / 6) * 0.27,
+                          child: Transform.translate(
+                              offset: Offset(0, _controllerAnimation.value * -(_isLoginPressed ? height * 0.2 : height * 0.26)),
+                              child: SvgPicture.asset('resources/images/logo.svg')
+                          )
+                      )
                     ),
                     Align(
                       alignment: Alignment.bottomCenter,
@@ -145,7 +100,8 @@ class _SignState extends State<SignPage> {
                             }
                         )
                       )
-                    )
+                    ),
+                    _dragDetector()
                   ]
               );
             }
@@ -155,10 +111,7 @@ class _SignState extends State<SignPage> {
 
   BoxDecoration _background() {
     return BoxDecoration(
-        borderRadius: BorderRadius.vertical(bottom: Radius.elliptical(MediaQuery
-            .of(context)
-            .size
-            .width, _controllerAnimation.value == 0 ? 0 : 100)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.elliptical(MediaQuery.of(context).size.width, _controllerAnimation.value == 0 ? 0 : 100)),
         gradient: LinearGradient(
             begin: Alignment.bottomRight,
             end: Alignment.topLeft,
@@ -167,6 +120,71 @@ class _SignState extends State<SignPage> {
               Color(0xFFeaafc8)
             ]
         )
+    );
+  }
+
+  Widget _signButton(){
+    return Container(
+        height: 100,
+        width: 100,
+        child: AnimatedBuilder(
+            animation: CurvedAnimation(parent: _controllerSign, curve: Curves.fastOutSlowIn),
+            builder: (context, child) {
+              return Stack(
+                  alignment: Alignment.center,
+                  children: <Widget>[
+                    _buildContainerAnimation(50  * _controllerSign.value),
+                    _buildContainerAnimation(70  * _controllerSign.value),
+                    _buildContainerAnimation(90  * _controllerSign.value),
+                    _buildContainerAnimation(110 * _controllerSign.value),
+                    FloatingActionButton(
+                        onPressed: null,
+                        child: Icon(Icons.login),
+                        backgroundColor: Colors.blue,
+                        elevation: 5
+                    )
+                  ]
+              );
+            }
+        )
+    );
+  }
+
+  Widget _buildContainerAnimation(double radius) {
+    return Container(
+      width: radius,
+      height: radius,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.blue.withOpacity(1 - _controllerSign.value),
+      ),
+    );
+  }
+
+  Widget _dragDetector(){
+    return Positioned(
+      left: _left,
+      bottom: 100,
+      child: GestureDetector(
+          onHorizontalDragStart: (view){
+            Offset position = Offset(view.globalPosition.dx - 20, view.globalPosition.dy);
+            setState(() {
+              _left = position.dx;
+            });
+          },
+          onHorizontalDragUpdate: (view){
+            Offset position = Offset(view.globalPosition.dx - 20, view.globalPosition.dy);
+            setState(() {
+              _left = position.dx;
+            });
+          },
+          onHorizontalDragEnd: (view){
+            setState(() {
+              _left = 150;
+            });
+          },
+          child: _signButton()
+      ),
     );
   }
 }
