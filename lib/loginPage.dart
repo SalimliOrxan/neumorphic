@@ -6,7 +6,7 @@ class LoginPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _controller = useAnimationController(duration: Duration(milliseconds: 1700));
+    final controller = useAnimationController(duration: Duration(milliseconds: 700));
 
     return Scaffold(
         backgroundColor: Colors.transparent,
@@ -58,17 +58,15 @@ class LoginPage extends HookWidget {
                     children: [
                       NeumorphicButton(
                           onPressed: () {
-                            _controller.forward();
-                            _controller.addStatusListener((status) {
-                              print(status);
+                            controller.forward();
+                            controller.addStatusListener((status) {
                               if(status == AnimationStatus.completed){
-                                _controller.reverse();
+                                controller.reverse();
                               }
                               else if(status == AnimationStatus.dismissed){
-                                _controller.forward();
+                                controller.forward();
                               }
                             });
-
                             },// Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => A())),
                           child: Center(child: Text('Login', style: TextStyle(color: Colors.black))),
                           padding: EdgeInsets.all(10),
@@ -80,13 +78,13 @@ class LoginPage extends HookWidget {
                           )
                       ),
                       AnimatedBuilder(
-                          animation: _controller,
+                          animation: controller,
                           builder: (_, child){
                             return Padding(
                               padding: EdgeInsets.only(left: 7),
                               child: Container(
                                   decoration: _background(),
-                                  width: (MediaQuery.of(context).size.width - 55) * _controller.value,
+                                  width: (MediaQuery.of(context).size.width - 55) * controller.value,
                                   height: 3
                               )
                             );
