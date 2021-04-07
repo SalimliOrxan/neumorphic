@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+final providerLoading = StateProvider.autoDispose((_) => false);
+
 
 class LoginPage extends HookWidget {
 
@@ -18,6 +22,7 @@ class LoginPage extends HookWidget {
                   child: Neumorphic(
                       padding: EdgeInsets.only(left: 10, right: 10),
                       child: TextField(
+                          enabled: !useProvider(providerLoading).state,
                           textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
@@ -37,6 +42,7 @@ class LoginPage extends HookWidget {
                     child: Neumorphic(
                         padding: EdgeInsets.only(left: 10, right: 10),
                         child: TextField(
+                            enabled: !useProvider(providerLoading).state,
                             textInputAction: TextInputAction.send,
                             keyboardType: TextInputType.visiblePassword,
                             obscureText: true,
@@ -57,17 +63,27 @@ class LoginPage extends HookWidget {
                   child: Column(
                     children: [
                       NeumorphicButton(
-                          onPressed: () {
-                            controller.forward();
-                            controller.addStatusListener((status) {
-                              if(status == AnimationStatus.completed){
-                                controller.reverse();
-                              }
-                              else if(status == AnimationStatus.dismissed){
-                                controller.forward();
-                              }
-                            });
-                            },// Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => A())),
+                          onPressed: (){
+                            if(controller.isAnimating){
+                              context.read(providerLoading).state = false;
+                              controller
+                                ..reset()
+                                ..stop()
+                                ..removeStatusListener((_) { });
+                            } else {
+                              context.read(providerLoading).state = true;
+                              controller.forward();
+                              controller.addStatusListener((status) {
+                                if(status == AnimationStatus.completed){
+                                  controller.reverse();
+                                }
+                                else if(status == AnimationStatus.dismissed){
+                                  controller.forward();
+                                }
+                              });
+                            }
+                            // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => A())),
+                          },
                           child: Center(child: Text('Login', style: TextStyle(color: Colors.black))),
                           padding: EdgeInsets.all(10),
                           style: NeumorphicStyle(

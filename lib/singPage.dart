@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/loginPage.dart';
 import 'package:flutter_app/registerPage.dart';
@@ -13,19 +14,23 @@ class SignPage extends StatefulHookWidget {
 }
 
 class _SignState extends State<SignPage> {
-
-  AnimationController _controllerAnimation, _controllerSign;
+  
+  final _providerPositionY = StateProvider.autoDispose<double>((_) => 100.0);
+  AnimationController _controllerAnimation, _controllerRipple, _controllerRippleDrag;
   bool _isLoginPressed = true;
-  double _left = 150;
 
   @override
   Widget build(BuildContext context) {
-    _controllerAnimation = useAnimationController(duration: Duration(milliseconds: 400));
-    _controllerSign      = useAnimationController(duration: Duration(milliseconds: 1200), lowerBound: 0.5)..repeat();
+    _controllerAnimation  = useAnimationController(duration: Duration(milliseconds: 400));
+    _controllerRippleDrag = useAnimationController(duration: Duration(milliseconds: 400));
+    _controllerRipple     = useAnimationController(duration: Duration(milliseconds: 1200), lowerBound: 0.5)..repeat();
+
+    final _paddingBottomSignButton = useProvider(_providerPositionY).state;
+    final isLoading                = useProvider(providerLoading).state;
 
     return Scaffold(
         body: LayoutBuilder(
-            builder: (context, constraints) {
+            builder: (context, constraints){
               double height                     = constraints.maxHeight;
               double transformLengthInLogin     = height * 0.43;
               double transformLengthInRegister  = height * 0.6;
@@ -40,18 +45,21 @@ class _SignState extends State<SignPage> {
                         builder: (context, child) {
                           return Transform.translate(
                               offset: Offset(0, _controllerAnimation.value * -(_isLoginPressed ? transformLengthInLogin : transformLengthInRegister)),
-                              child: Container(decoration: _background())
+                              child: Container(decoration: _background(constraints.maxWidth))
                           );
                         }
                     ),
                     AnimatedBuilder(
                       animation: _controllerAnimation,
                       builder: (context, _) => FractionallySizedBox(
-                          heightFactor: _controllerAnimation.value == 0 ? 0.3 : (1 - _controllerAnimation.value / 6) * 0.27,
+                        heightFactor: _controllerAnimation.value == 0 ? 0.6 : (1 - _controllerAnimation.value / 6) * 0.6,
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 200),
                           child: Transform.translate(
-                              offset: Offset(0, _controllerAnimation.value * -(_isLoginPressed ? height * 0.2 : height * 0.26)),
-                              child: SvgPicture.asset('resources/images/logo.svg')
+                                offset: Offset(0, _controllerAnimation.value * -(_isLoginPressed ? height * 0.1 : height * 0.16)),
+                                child: SvgPicture.asset('resources/images/logo.svg')
                           )
+                        )
                       )
                     ),
                     Align(
@@ -62,8 +70,8 @@ class _SignState extends State<SignPage> {
                             animation: _controllerAnimation,
                             builder: (context, child) {
                               return FadeTransition(
-                                opacity: _controllerAnimation,
-                                child: Transform.translate(
+                                  opacity: _controllerAnimation,
+                                  child: Transform.translate(
                                   offset: Offset(
                                       0,
                                       _controllerAnimation.value == 0
@@ -75,18 +83,26 @@ class _SignState extends State<SignPage> {
                                   child: Column(
                                       mainAxisAlignment: MainAxisAlignment.end,
                                       children: [
-                                        NeumorphicButton(
-                                            onPressed: () => _controllerAnimation.reverse().then((_) => _isLoginPressed = true),
-                                            child: Icon(Icons.close, size: 25, color: Colors.black),
-                                            padding: EdgeInsets.all(10),
-                                            style: NeumorphicStyle(
-                                                shape: NeumorphicShape.convex,
-                                                boxShape: NeumorphicBoxShape.circle(),
-                                                depth: 9,
-                                                surfaceIntensity: 0,
-                                                color: Color(0xFFF5EFEF),
-                                                lightSource: LightSource.bottomRight
-                                            )
+                                        IgnorePointer(
+                                          ignoring: isLoading,
+                                          child: NeumorphicButton(
+                                              onPressed: () async {
+                                                await _controllerAnimation.reverse();
+                                                _isLoginPressed = true;
+                                                _controllerRipple.repeat();
+                                                _controllerRippleDrag.reverse();
+                                              },
+                                              child: Icon(Icons.close, size: 25, color: isLoading ? Colors.grey : Colors.black),
+                                              padding: EdgeInsets.all(10),
+                                              style: NeumorphicStyle(
+                                                  shape: NeumorphicShape.convex,
+                                                  boxShape: NeumorphicBoxShape.circle(),
+                                                  depth: 9,
+                                                  surfaceIntensity: 0,
+                                                  color: Color(0xFFF5EFEF),
+                                                  lightSource: LightSource.bottomRight
+                                              )
+                                          ),
                                         ),
                                         Container(
                                             height: _isLoginPressed ? heightBottomPageInLogin : heightBottomPageInRegister,
@@ -101,7 +117,7 @@ class _SignState extends State<SignPage> {
                         )
                       )
                     ),
-                    _dragDetector()
+                    _dragDetector(height, _paddingBottomSignButton)
                   ]
               );
             }
@@ -109,9 +125,9 @@ class _SignState extends State<SignPage> {
     );
   }
 
-  BoxDecoration _background() {
+  BoxDecoration _background(double width){
     return BoxDecoration(
-        borderRadius: BorderRadius.vertical(bottom: Radius.elliptical(MediaQuery.of(context).size.width, _controllerAnimation.value == 0 ? 0 : 100)),
+        borderRadius: BorderRadius.vertical(bottom: Radius.elliptical(width, _controllerAnimation.value == 0 ? 0 : 100)),
         gradient: LinearGradient(
             begin: Alignment.bottomRight,
             end: Alignment.topLeft,
@@ -124,29 +140,34 @@ class _SignState extends State<SignPage> {
   }
 
   Widget _signButton(){
-    return Container(
-        height: 100,
-        width: 100,
-        child: AnimatedBuilder(
-            animation: CurvedAnimation(parent: _controllerSign, curve: Curves.fastOutSlowIn),
-            builder: (context, child) {
-              return Stack(
-                  alignment: Alignment.center,
-                  children: <Widget>[
-                    _buildContainerAnimation(50  * _controllerSign.value),
-                    _buildContainerAnimation(70  * _controllerSign.value),
-                    _buildContainerAnimation(90  * _controllerSign.value),
-                    _buildContainerAnimation(110 * _controllerSign.value),
-                    FloatingActionButton(
-                        onPressed: null,
-                        child: Icon(Icons.login),
-                        backgroundColor: Colors.blue,
-                        elevation: 5
-                    )
-                  ]
-              );
-            }
-        )
+    return AnimatedBuilder(
+        animation: _controllerRippleDrag,
+        builder: (context, _) => Container(
+          height: (1 - _controllerRippleDrag.value) * 100,
+          width: (1 - _controllerRippleDrag.value) * 100,
+          child: AnimatedBuilder(
+              animation: CurvedAnimation(parent: _controllerRipple, curve: Curves.fastOutSlowIn),
+              builder: (context, child) {
+                return Stack(
+                    alignment: Alignment.center,
+                    children: <Widget>[
+                      _buildContainerAnimation(50  * _controllerRipple.value),
+                      _buildContainerAnimation(70  * _controllerRipple.value),
+                      _buildContainerAnimation(90  * _controllerRipple.value),
+                      _buildContainerAnimation(110 * _controllerRipple.value),
+                      NeumorphicButton(
+                          child: Icon(Icons.drag_indicator, color: Color(0xFF654ea3)),
+                          style: NeumorphicStyle(
+                              shape: NeumorphicShape.convex,
+                              depth: 9,
+                              boxShape: NeumorphicBoxShape.circle(),
+                          )
+                      )
+                    ]
+                );
+              }
+          )
+      )
     );
   }
 
@@ -156,35 +177,50 @@ class _SignState extends State<SignPage> {
       height: radius,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.blue.withOpacity(1 - _controllerSign.value),
-      ),
+        color: Colors.white.withOpacity(1 - _controllerRipple.value)
+      )
     );
   }
 
-  Widget _dragDetector(){
+  Widget _dragDetector(double height, double paddingBottom){
+    final sizeActiveArea = 10;
+    final endLimit       = 210;
+    final radiusIcon     = 50;
+
     return Positioned(
-      left: _left,
-      bottom: 100,
+      left: 0,
+      right: 0,
+      bottom: paddingBottom,
       child: GestureDetector(
-          onHorizontalDragStart: (view){
-            Offset position = Offset(view.globalPosition.dx - 20, view.globalPosition.dy);
-            setState(() {
-              _left = position.dx;
-            });
+          child: _signButton(),
+          onVerticalDragStart: (view){
+            final positionCenter = view.globalPosition.dy + radiusIcon;
+            context.read(_providerPositionY).state = height - positionCenter;
           },
-          onHorizontalDragUpdate: (view){
-            Offset position = Offset(view.globalPosition.dx - 20, view.globalPosition.dy);
-            setState(() {
-              _left = position.dx;
-            });
+          onVerticalDragUpdate: (view){
+            _controllerRipple.stop();
+            final positionCenter = view.globalPosition.dy + radiusIcon;
+            if(height - positionCenter <= endLimit && positionCenter <= height)
+              context.read(_providerPositionY).state = height - positionCenter;
           },
-          onHorizontalDragEnd: (view){
-            setState(() {
-              _left = 150;
-            });
-          },
-          child: _signButton()
-      ),
+          onVerticalDragEnd: (view) async {
+            if(paddingBottom >= endLimit - sizeActiveArea){
+              _isLoginPressed = true;
+              _controllerRippleDrag.forward();
+              await _controllerAnimation.forward();
+              _controllerRipple.stop();
+            }
+            else if(paddingBottom <= sizeActiveArea){
+              _isLoginPressed = false;
+              _controllerRippleDrag.forward();
+              await _controllerAnimation.forward();
+              _controllerRipple.stop();
+            }
+            else _controllerRipple.repeat();
+
+            context.read(_providerPositionY).state = 100.0;
+          }
+      )
     );
   }
 }
