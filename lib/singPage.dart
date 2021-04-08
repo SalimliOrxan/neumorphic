@@ -16,14 +16,15 @@ class SignPage extends StatefulHookWidget {
 class _SignState extends State<SignPage> {
   
   final _providerPositionY = StateProvider.autoDispose<double>((_) => 100.0);
-  AnimationController _controllerAnimation, _controllerRipple, _controllerRippleDrag;
+  AnimationController _controllerAnimation, _controllerRipple, _controllerRippleDrag, _controllerRippleArrow;
   bool _isLoginPressed = true;
 
   @override
   Widget build(BuildContext context) {
-    _controllerAnimation  = useAnimationController(duration: Duration(milliseconds: 400));
-    _controllerRippleDrag = useAnimationController(duration: Duration(milliseconds: 400));
-    _controllerRipple     = useAnimationController(duration: Duration(milliseconds: 1200), lowerBound: 0.5)..repeat();
+    _controllerAnimation   = useAnimationController(duration: Duration(milliseconds: 400));
+    _controllerRippleDrag  = useAnimationController(duration: Duration(milliseconds: 400));
+    _controllerRipple      = useAnimationController(duration: Duration(milliseconds: 1200), lowerBound: 0.5)..repeat();
+    _controllerRippleArrow = useAnimationController(duration: Duration(milliseconds: 1000))..repeat();
 
     final _paddingBottomSignButton = useProvider(_providerPositionY).state;
     final isLoading                = useProvider(providerLoading).state;
@@ -117,7 +118,9 @@ class _SignState extends State<SignPage> {
                         )
                       )
                     ),
-                    _dragDetector(height, _paddingBottomSignButton)
+                    _dragDetector(height, _paddingBottomSignButton),
+                    _arrowAnimation(true),
+                    _arrowAnimation(false)
                   ]
               );
             }
@@ -132,8 +135,8 @@ class _SignState extends State<SignPage> {
             begin: Alignment.bottomRight,
             end: Alignment.topLeft,
             colors: [
-              Color(0xFF654ea3),
-              Color(0xFFeaafc8)
+              Color(0xFF4568dc),
+              Color(0xFFb06ab3)
             ]
         )
     );
@@ -143,42 +146,105 @@ class _SignState extends State<SignPage> {
     return AnimatedBuilder(
         animation: _controllerRippleDrag,
         builder: (context, _) => Container(
-          height: (1 - _controllerRippleDrag.value) * 100,
-          width: (1 - _controllerRippleDrag.value) * 100,
-          child: AnimatedBuilder(
-              animation: CurvedAnimation(parent: _controllerRipple, curve: Curves.fastOutSlowIn),
-              builder: (context, child) {
-                return Stack(
-                    alignment: Alignment.center,
-                    children: <Widget>[
-                      _buildContainerAnimation(50  * _controllerRipple.value),
-                      _buildContainerAnimation(70  * _controllerRipple.value),
-                      _buildContainerAnimation(90  * _controllerRipple.value),
-                      _buildContainerAnimation(110 * _controllerRipple.value),
-                      NeumorphicButton(
-                          child: Icon(Icons.drag_indicator, color: Color(0xFF654ea3)),
-                          style: NeumorphicStyle(
-                              shape: NeumorphicShape.convex,
+            height: (1 - _controllerRippleDrag.value) * 100,
+            width: (1 - _controllerRippleDrag.value) * 100,
+            child: AnimatedBuilder(
+                animation: CurvedAnimation(parent: _controllerRipple, curve: Curves.fastOutSlowIn),
+                builder: (context, child) {
+                  return Stack(
+                      alignment: Alignment.center,
+                      children: <Widget>[
+                        _rippleCircleContainer(50  * _controllerRipple.value),
+                        _rippleCircleContainer(70  * _controllerRipple.value),
+                        _rippleCircleContainer(90  * _controllerRipple.value),
+                        _rippleCircleContainer(110 * _controllerRipple.value),
+                        NeumorphicButton(
+                            child: Icon(Icons.drag_indicator, color: Color(0xFFb06ab3)),
+                            style: NeumorphicStyle(
+                              shape: NeumorphicShape.concave,
                               depth: 9,
                               boxShape: NeumorphicBoxShape.circle(),
-                          )
-                      )
-                    ]
-                );
-              }
-          )
-      )
+                            )
+                        )
+                      ]
+                  );
+                }
+            )
+        )
     );
   }
 
-  Widget _buildContainerAnimation(double radius) {
+  Widget _rippleCircleContainer(double radius){
     return Container(
-      width: radius,
-      height: radius,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white.withOpacity(1 - _controllerRipple.value)
-      )
+        width: radius,
+        height: radius,
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.white.withOpacity(1 - _controllerRipple.value)
+        )
+    );
+  }
+
+  Widget _arrowAnimation(bool isUp){
+    return AnimatedBuilder(
+        animation: _controllerRippleDrag,
+        builder: (context, _) => Positioned(
+            left: 0,
+            right: 0,
+            bottom: isUp ? 210 : 20,
+            child: Visibility(
+              visible: !(_controllerRippleDrag.value >= 1),
+              child: AnimatedBuilder(
+                  animation: CurvedAnimation(parent: _controllerRippleArrow, curve: Curves.fastOutSlowIn),
+                  builder: (context, _){
+                    final opacity1 = isUp ? 1 - _controllerRippleArrow.value : _controllerRippleArrow.value;
+                    final opacity2 = 1 - opacity1;
+
+                    return Column(
+                        children: <Widget>[
+                          Visibility(
+                              visible: isUp,
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: NeumorphicText(
+                                    'Login',
+                                    textStyle: NeumorphicTextStyle(fontSize: 10),
+                                    style: NeumorphicStyle(
+                                        depth: 9,
+                                        shape: NeumorphicShape.convex
+                                    )
+                                ),
+                              )
+                          ),
+                          _rippleArrowContainer(opacity1, isUp),
+                          _rippleArrowContainer(opacity2, isUp),
+                          Visibility(
+                              visible: !isUp,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: NeumorphicText(
+                                  'Register',
+                                  textStyle: NeumorphicTextStyle(fontSize: 10),
+                                  style: NeumorphicStyle(
+                                    depth: 9,
+                                    shape: NeumorphicShape.convex
+                                  )
+                                ),
+                              )
+                          ),
+                        ]
+                    );
+                  }
+              )
+            )
+        )
+    );
+  }
+
+  Widget _rippleArrowContainer(double opacity, bool isUp){
+    return Container(
+        height: 20,
+        child: Icon(isUp ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, color: Colors.white.withOpacity(opacity))
     );
   }
 
